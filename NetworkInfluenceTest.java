@@ -64,7 +64,7 @@ public class NetworkInfluenceTest {
 		Assert.assertEquals(d5,-1);
 
 	}
-/*
+
 	@Test
 	public void testInfluenceString() {
 		float inf1 = ni.influence("A");
@@ -97,7 +97,7 @@ public class NetworkInfluenceTest {
 		float inf3 = ni.influence(arr);
 		Assert.assertEquals(inf3,6,0.0f);
 	}
-
+/*
 	@Test
 	public void testMostInfluentialDegree() {
 		ArrayList<String> most = ni.mostInfluentialDegree(2);

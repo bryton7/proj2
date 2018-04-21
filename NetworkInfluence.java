@@ -1,12 +1,15 @@
 
 
 import java.io.FileNotFoundException;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Stack;
+
+import java.util.ListIterator;
 
 import java.util.Collections;
 
@@ -119,17 +122,17 @@ public class NetworkInfluence{
 		float influence = 0;
 		
 		HashSet<String> visited = new HashSet<String>();
-		Queue<String> queue = new LinkedList<String>();
+		Queue<SimpleEntry<String,Integer>> queue = new LinkedList<SimpleEntry<String,Integer>>();
 		
-		queue.add(u);
+		queue.add(new SimpleEntry<String,Integer>(u,0));
 		
 		while(!queue.isEmpty()){
-			String node = queue.poll();
-			if(!visited.contains(node)){
-				influence += 1 / Math.pow(2, distance(u, node));
-				visited.add(node);
-				for(String v : graph.adjList[graph.vertices.get(node)]){
-					queue.add(v);
+			SimpleEntry<String,Integer> node = queue.poll();
+			if(!visited.contains(node.getKey())){
+				influence += 1 / Math.pow(2,node.getValue());
+				visited.add(node.getKey());
+				for(String v : graph.adjList[graph.vertices.get(node.getKey())]){
+					queue.add(new SimpleEntry<String,Integer>(v,node.getValue()+1));
 				}
 			}	
 		}
@@ -141,25 +144,27 @@ public class NetworkInfluence{
 		float influence = 0;
 		
 		HashSet<String> visited = new HashSet<String>();
-		Queue<String> queue = new LinkedList<String>();
+		Queue<SimpleEntry<String,Integer>> queue = new LinkedList<SimpleEntry<String,Integer>>();
 		
-		for(int i=0; i<s.size(); i++){
-			queue.add(s.get(i));
+		for(int i = 0; i < s.size(); i++){
+			queue.add(new SimpleEntry<String,Integer>(s.get(i), 0));
 		}
 		
 		while(!queue.isEmpty()){
-			String node = queue.poll();
-			if(!visited.contains(node)){
-				influence += 1 / Math.pow(2, distance(s, node));
-				visited.add(node);
-				for(String v : graph.adjList[graph.vertices.get(node)]){
-					queue.add(v);
+			SimpleEntry<String,Integer> node = queue.poll();
+			if(!visited.contains(node.getKey())){
+				influence += 1 / Math.pow(2,node.getValue());
+				visited.add(node.getKey());
+				for(String v : graph.adjList[graph.vertices.get(node.getKey())]){
+					queue.add(new SimpleEntry<String,Integer>(v,node.getValue()+1));
 				}
 			}	
 		}
 		
 		return influence;
 	}
+	
+	
 	
 	
 }
