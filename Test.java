@@ -4,10 +4,27 @@ import java.util.ArrayList;
 public class Test{
 	
 	public static void main(String[] args) {
-        NetworkInfluence ni = new NetworkInfluence("src/inftest.txt");
+        NetworkInfluence ni = new NetworkInfluence("src/WikiCS.txt");
         
-        ArrayList<String> s4 = ni.shortestPath("D","E");
-        System.out.println(s4);
+        ArrayList<String> infDegree = new ArrayList<String>();
+        ArrayList<String> infModular = new ArrayList<String>();
+        ArrayList<String> infSubModular = new ArrayList<String>();
+        
+        infDegree = ni.mostInfluentialDegree(10);
+        infModular = ni.mostInfluentialModular(10);
+        infSubModular = ni.mostInfluentialSubModular(10);
+        
+        System.out.println("10 most influential degree greedy nodes");
+        System.out.println(infDegree);
+        System.out.println("10 most influential modular greedy nodes");
+        System.out.println(infModular);
+        System.out.println("10 most influential submodular greedy nodes");
+        System.out.println(infSubModular);
+        
+        
+        
+        //ArrayList<String> s4 = ni.shortestPath("D","E");
+       //System.out.println(s4);
 		
 //        ArrayList<String> topics = new ArrayList<String>();
 ////		topics.add("Iowa State");
@@ -19,6 +36,8 @@ public class Test{
 //		i++;
 //		System.out.println(i);
 		 
+        
+        
 		
 		
     }

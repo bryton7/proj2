@@ -111,13 +111,13 @@ public class NetworkInfluenceTest {
 		Assert.assertEquals(most,new ArrayList<String>(Arrays.asList(new String[] {"A","B","E"})));
 		//Your output array may be in a different order
 	}
-/*
+
 	@Test
 	public void testMostInfluentialSubModular() {
 		ArrayList<String> most = ni.mostInfluentialSubModular(3);
 		Assert.assertEquals(most,new ArrayList<String>(Arrays.asList(new String[] {"A","B","D"})));
 		//Your output array may be in a different order
 	}
-*/
+
 	
 }

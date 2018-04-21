@@ -2,8 +2,10 @@ import java.io.FileNotFoundException;
 import java.util.AbstractMap.SimpleEntry;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Stack;
@@ -48,7 +50,7 @@ public class NetworkInfluence{
 	 */
 	public ArrayList<String> shortestPath(String u, String v){
 		ArrayList<String> path = new ArrayList<>();
-		HashMap<String, Boolean> visited = new HashMap<String, Boolean>();
+		HashSet<String> visited = new HashSet<String>();
 		
 		//empty path if node doesnt exist
 		if(!graph.vertices.containsKey(u) || !graph.vertices.containsKey(v)){
@@ -68,16 +70,16 @@ public class NetworkInfluence{
 		queue.add(u);
 		stack.add(u);
 		
-		visited.put(u, true);
+		visited.add(u);
 		
 		//do BFS
 		while(!queue.isEmpty()){
 			String curNode = queue.poll();
 			//add all vertices with an edge from current node
 			for(String to : graph.adjList[graph.vertices.get(curNode)]){
-				if(!visited.containsKey(to) && !curNode.equals(to)){
+				if(!visited.contains(to) && !curNode.equals(to)){
 					queue.add(to);
-					visited.put(to, true);
+					visited.add(to);
 					stack.add(to);
 					if(curNode.equals(v)){
 						break;
@@ -316,6 +318,72 @@ public class NetworkInfluence{
 		return mostInfluential;
 		
 	}
+	
+	public ArrayList<String> mostInfluentialSubModular(int k){
+		ArrayList<String> mostInfluential = new ArrayList<String>();
+		ArrayList<String> nodes = new ArrayList<String>();
+		
+		//add all nodes
+		for(int i = 0; i < graph.adjList.length; i++){
+			if(!nodes.contains(graph.adjList[i].get(0))){
+				nodes.add(graph.adjList[i].get(0));
+			}
+		}
+		
+		//find top k most influential
+		for(int i = 0; i < k; i++){
+			for(int j = 0; j < nodes.size(); j++){
+				//if current node is in s
+				boolean contained = false;
+				for(int x = 0; x < mostInfluential.size(); x++){
+					if(mostInfluential.get(x).equals(nodes.get(j))){
+						//node is already in s
+						contained = true;
+					}
+				}
+
+				//current node not in set
+				if(contained == false){
+					//list of v's
+					ArrayList<String> curNodes = new ArrayList<String>();
+					curNodes.addAll(mostInfluential);
+					curNodes.add(nodes.get(j));
+
+					boolean newInfluential = false;
+					//check for new most influential
+					for(int y = 0; y < nodes.size(); y++){
+						//list of u's
+						ArrayList<String> nextNodes = new ArrayList<String>();
+						contained = false;
+						for(int z = 0; z < mostInfluential.size(); z++){
+							if(mostInfluential.get(z).equals(nodes.get(y))){
+								//node is already in s
+								contained = true;
+							}
+						}
+						//not in set
+						if((j != y) && (contained == false)){
+							nextNodes.addAll(mostInfluential);
+							nextNodes.add(nodes.get(y));
+							//inf(S U u) > inf(S U v)
+							if(influence(nextNodes) > influence(curNodes)){
+								newInfluential = true;
+							}
+						}
+					}
+					
+					//add v to set
+					if(newInfluential == false){
+						mostInfluential.add(nodes.get(j));
+						break;
+					}
+				}
+			}
+		}
+
+		return mostInfluential;
+	}
+	
 	
 	
 	
