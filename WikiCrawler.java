@@ -1,11 +1,7 @@
+package proj2;
 
-
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
-import java.io.Writer;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
@@ -14,114 +10,189 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Scanner;
 
-public class WikiCrawler{
-	static final String BASE_URL = "https://en.wikipedia.org/";
+//use any import that is from java.*
+
+
+public class WikiCrawler {
+	
+	//needs to be named this, will be changed by instructor to grade
+	private static final String BASE_URL = "https://en.wikipedia.org";
 	
 	private String seed;
 	private int numPages;
 	private ArrayList<String> keywords;
 	private String outFile;
-
-	public WikiCrawler(String seedUrl, int max, ArrayList<String> topics, String fileName){
-		this.seed = seedUrl;
-		this.numPages = max;
-		this.keywords = topics;
-		this.outFile = fileName;
-
+	
+	//constructor to setup crawler
+	public WikiCrawler(String seedURL, int max, ArrayList<String> topics, String fileName) {
+		seed = seedURL;
+		numPages = max;
+		keywords = topics;
+		outFile = fileName;
 	}
-
-	public void crawl() throws MalformedURLException, IOException, InterruptedException{
+	public void crawl() throws InterruptedException, IOException {
+		//count number of pages with topics
+		int relevantPages = 0;
+				
+		//counter to keep track of page requests
+		int count = 0;
+		
 		//set up output file writer
-		PrintWriter writer = new PrintWriter(outFile, "UTF-8");
+		PrintWriter writer = new PrintWriter(outFile,"UTF-8");
+		
 		writer.println(numPages);
 		
-		//set up queue
-		Queue<SimpleEntry<String, String>> toVisit = new LinkedList<SimpleEntry<String,String>>();
-		toVisit.add(new SimpleEntry<String,String>("",seed));
+		//Queue<String> queue = new Queue<String>();
+		//
 		
-		//set up list of visited pages
+		
+		//Queue<SimpleEntry<String, String>> queue_visit = new Queue<SimpleEntry<String,String>>();
+		//try linked list to see if easier debug? Also need to store key and value
+		//using linked list implementation, holding SimpleEntry of string (from abstract map)
+		Queue<SimpleEntry<String,String>> queueVisit = new LinkedList<SimpleEntry<String,String>>();
+		//add initial with seed value.
+		queueVisit.add(new SimpleEntry<String,String>("",seed));
+		
+		//set up list of visited pages as hashmap for fast search 0(1)
+		//2. Initialize a Queue Q and a list visited.
 		HashSet<String> visited = new HashSet<String>();
 		
-		int relevantPages = 0;	//count number of pages with topics
-		int counter = 0;		//counter to keep track of page requests
 		
-		while(!toVisit.isEmpty() && (relevantPages <= numPages));
-			//one edge
-			SimpleEntry<String,String> edge = toVisit.poll();
-			String curPage = edge.getValue();
+		
+		//why is this part not working??
+		//oops it was a semicolon not a bracket -- sorry
+		while(!queueVisit.isEmpty() && (relevantPages < numPages)){
 			
-			//keep track of keywords on this page
-			ArrayList<String> pageTopics = new ArrayList<String>();
-			pageTopics.addAll(keywords);
+			// get next edge
+			SimpleEntry<String,String> edge = queueVisit.poll();
+			String currentPage = edge.getValue();
 			
-			if(!visited.contains(curPage)){
-				//set up scanner for current wiki page
-				Scanner scanner = new Scanner((new URL(BASE_URL+curPage)).openStream());
-				
+			//create new ArrayList of topics so that they can be removed when found
+			ArrayList<String> coveredKeys = new ArrayList<String>();
+			//add all topics
+			for(int k = 0; k < keywords.size(); k++){
+				coveredKeys.add(keywords.get(k));
+			}
+			
+			//check if it contains in hashmap
+			if(!visited.contains(currentPage)){
 				boolean actualContent = false;
+				//holder
+				HashSet<String> temp = new HashSet<String>();
 				
-				//keep track of links on the current page
-				LinkedList<SimpleEntry<String,String>> links = new LinkedList<SimpleEntry<String,String>>();
+				//sometimes this takes a long time?? not sure if this is cause?
+				Scanner myScanner = new Scanner((new URL(BASE_URL+currentPage)).openStream());
+			
+				//keep track of links on the current page, same format as above (with SimpleEntry)
+				LinkedList<SimpleEntry<String,String>> lists = new LinkedList<SimpleEntry<String,String>>();
 				
-				visited.add(curPage);
+				//add to hashmap of visited
+				visited.add(currentPage);
 				
-				while(scanner.hasNextLine()){
-					String curLine = scanner.nextLine();
+				while(myScanner.hasNextLine()){
+					String currentLine = myScanner.nextLine();
 					
-					//found actual content
-					if(curLine.contains("<p>")){
-						actualContent = true;
-					}
+					//For this PA, you may assume the following: The “actual text content” of the
+					//page starts immediately after the first occurrence of the html tag <p>.
+					if(currentLine.contains("<p>")) actualContent = true;
 					
-					//find keywords
-					if(actualContent && !pageTopics.isEmpty()){
-						for(int i=0; i < pageTopics.size(); i++){
-							if(curLine.contains(pageTopics.get(i))){
-								pageTopics.remove(i);
+					//check if topic has been covered
+					//save for search time
+					if(!coveredKeys.isEmpty()){
+						//check remaining keys
+						for(int i=0; i<coveredKeys.size(); i++){
+							//if contains remove
+							if(currentLine.contains(coveredKeys.get(i))){
+								coveredKeys.remove(i);
 							}
 						}
 					}
 					
-					//find links
-					if(curLine.contains("href=\"/wiki/")){
-						int index = curLine.indexOf("href=\"/wiki/") + 6;
-						String nextPage = "";
-						while(curLine.charAt(index)!='\"'){
-							nextPage += curLine.charAt(index);
+					//check if current contains any of the topics
+//					//Must handle if topics is empty!!!
+////					if(!?.isEmpty()){
+////						for(SimpleEntry<String, String> i: links){
+////							if(currentLine.contains(i.getKey())){
+////								links.remove(i);
+////							}
+////						}
+////					}
+//					
+//					//
+					//href and /wiki/ are where the header starts
+					while(currentLine.contains("href=\"/wiki/") && actualContent){
+						
+						String nextPage = ""; 
+						//ignore href=/ when getting value from wiki
+						
+						//int startOfLink = currentLine.indexOf("href=\"/wiki/");
+						int index = currentLine.indexOf("href=\"/wiki/")+6;
+						
+						//if(index >= 6) {
+						//}
+						
+						//crawl over the next part until \ is hit
+						
+						//end of section if true
+						while(currentLine.charAt(index)!='\"'){
+							nextPage += currentLine.charAt(index);
 							index++;
 						}
-						if(!nextPage.contains(":") && !nextPage.contains("#")){
-							links.add(new SimpleEntry<String,String>(edge.getValue(),nextPage));
+						//according to pdf do not allow things with : or # as these are images or other irrelevant info.
+						if(!nextPage.contains(":")&&!nextPage.contains("#")) { //duplicates???
+							if (!temp.contains(nextPage)){
+								lists.add(new SimpleEntry<String,String>(edge.getValue(),nextPage));
+								temp.add(nextPage);
+							}
 						}
+						//update current line for next use
+						currentLine = currentLine.replace(nextPage,"");
 					}
-					
-					if(curLine.contains("<\\p>")) actualContent = false;		
-					
 				}
 				
-				boolean relevantPage = pageTopics.isEmpty();
 				
-				//if current page has all keywords
-				if(relevantPage){
+				// only add if everything has been hit
+				if(coveredKeys.isEmpty()){
+					
+					//populate main queue to then write
+					queueVisit.addAll(lists);
+					//increment
 					relevantPages++;
 					
-					//add to queue
-					toVisit.addAll(links);
-					
-					//write edge to output file
 					if(!edge.getKey().equals("")){
+						
+						//writer.println("test" + " " + edge.getValue());
 						writer.println(edge.getKey() + " " + edge.getValue());
 					}
 				}
-				
-				scanner.close();
-				counter++;
+				myScanner.close();
+				count++;
 				
 				//limit page requests
-				if(counter == 25){
-					counter = 0;
+//				//Wait for at least 3 seconds after
+//				//every 25 requests. If you do not adhere to this policy you will receive ZERO credit.
+//				//Please use Thread.sleep() for waiting.
+////				if(count == 25){
+////					count = 0;
+////					Thread.sleep(3000);
+////				}	
+//				//must use modulo since its every 25 requests.
+				if(count % 25==0){
 					Thread.sleep(3000);
-				}	
+				}
 			}
+		}
+		//write values to output file from the lists created previously
+		while(!queueVisit.isEmpty()){
+			//pop from queue
+			SimpleEntry<String,String> edge = queueVisit.poll();
+			
+			if(visited.contains(edge.getKey()) && visited.contains(edge.getValue())){
+				// output in form: /wiki/Iowa_State_University /wiki/Ames,_Iowa
+				writer.println(edge.getKey() + " " + edge.getValue());
+			}
+		}
+		//memory leak possible without
+		writer.close();
 	}
 }
