@@ -1,6 +1,3 @@
-package proj2;
-
-
 import java.io.FileNotFoundException;
 import java.util.AbstractMap.SimpleEntry;
 
@@ -10,6 +7,8 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Stack;
+
+import com.sun.org.apache.xpath.internal.axes.NodeSequence;
 
 import java.util.ListIterator;
 
@@ -166,7 +165,48 @@ public class NetworkInfluence{
 		return influence;
 	}
 	
-	
+	public ArrayList<String> mostInfluentialDegree(int k){
+		ArrayList<String> mostInfluential = new ArrayList<String>();
+		ArrayList<String> nodes = new ArrayList<String>();
+		
+		for(int i = 0; i < graph.adjList.length; i++){
+			if(!nodes.contains(graph.adjList[i].get(0))){
+				nodes.add(graph.adjList[i].get(0));
+			}
+		}
+		
+		ArrayList<SimpleEntry<String, Integer>> kInfluential = new ArrayList<SimpleEntry<String, Integer>>();
+		
+		for(int i = 0; i < graph.numVertices; i++){
+			int curDegree = outDegree(nodes.get(i));
+			
+			if(i < k){
+				kInfluential.add(new SimpleEntry<String, Integer>(nodes.get(i), curDegree));
+			}
+			else{
+				int minDegree = kInfluential.get(0).getValue();
+				int minIndex = 0;
+				
+				for(int j = 1; j < k; j++){
+					if(kInfluential.get(j).getValue() < minDegree){
+						minDegree = kInfluential.get(j).getValue();
+						minIndex = j;
+					}
+				}
+				if(curDegree > minDegree){
+					kInfluential.set(minIndex, new SimpleEntry<String, Integer>(nodes.get(i), curDegree));
+				}	
+			}
+		}
+		
+		for(SimpleEntry<String, Integer> v : kInfluential){
+			mostInfluential.add(v.getKey());
+			//System.out.println(v.getKey());
+		}
+		
+		return mostInfluential;
+		
+	}
 	
 	
 }

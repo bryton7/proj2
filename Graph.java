@@ -1,5 +1,3 @@
-package proj2;
-
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.io.File;

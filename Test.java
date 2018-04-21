@@ -1,4 +1,3 @@
-package proj2;
 
 import java.util.ArrayList;
 

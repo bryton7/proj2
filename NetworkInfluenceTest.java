@@ -1,5 +1,3 @@
-package proj2;
-
 import static org.junit.Assert.*;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -99,14 +97,14 @@ public class NetworkInfluenceTest {
 		float inf3 = ni.influence(arr);
 		Assert.assertEquals(inf3,6,0.0f);
 	}
-/*
+
 	@Test
 	public void testMostInfluentialDegree() {
 		ArrayList<String> most = ni.mostInfluentialDegree(2);
 		Assert.assertEquals(most,new ArrayList<String>(Arrays.asList(new String[] {"A","B"})));
 		//Your output array may be in a different order
 	}
-
+/*
 	@Test
 	public void testMostInfluentialModular() {
 		ArrayList<String> most = ni.mostInfluentialModular(3);
