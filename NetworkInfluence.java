@@ -117,10 +117,46 @@ public class NetworkInfluence{
 	
 	public float influence(String u){
 		float influence = 0;
+		
 		HashSet<String> visited = new HashSet<String>();
+		Queue<String> queue = new LinkedList<String>();
 		
+		queue.add(u);
 		
+		while(!queue.isEmpty()){
+			String node = queue.poll();
+			if(!visited.contains(node)){
+				influence += 1 / Math.pow(2, distance(u, node));
+				visited.add(node);
+				for(String v : graph.adjList[graph.vertices.get(node)]){
+					queue.add(v);
+				}
+			}	
+		}
 		
+		return influence;
+	}
+	
+	public float influence(ArrayList<String> s){
+		float influence = 0;
+		
+		HashSet<String> visited = new HashSet<String>();
+		Queue<String> queue = new LinkedList<String>();
+		
+		for(int i=0; i<s.size(); i++){
+			queue.add(s.get(i));
+		}
+		
+		while(!queue.isEmpty()){
+			String node = queue.poll();
+			if(!visited.contains(node)){
+				influence += 1 / Math.pow(2, distance(s, node));
+				visited.add(node);
+				for(String v : graph.adjList[graph.vertices.get(node)]){
+					queue.add(v);
+				}
+			}	
+		}
 		
 		return influence;
 	}
